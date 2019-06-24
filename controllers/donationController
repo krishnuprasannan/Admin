@@ -1,0 +1,183 @@
+const express = require('express');
+const router = express.Router();
+const nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
+
+const Donation = require('../models/donationmodel');
+const msg = new Donation( {name: 'ruighj',
+contactNumber :'956765364',
+email:'krishnapriyaprasannan080@gmail.com',
+amount: '60',
+cause:'ghuiejds',
+time : Date.now(),
+transactionID: 'uiokjn',
+orderID: 'iuiop'})
+msg.save()
+   .then(doc => {
+     console.log(doc)
+   })
+   .catch(err => {
+     console.error(err)
+   })
+
+const msges = new Donation( {name: ']poi',
+contactNumber :'9678678845',
+email:'koT@gmail.com',
+amount: '99',
+cause:'iokplkM',
+time : Date.now(),
+transactionID: 'JHGJ',
+orderID: 'jhbnm'})
+msges.save()
+   .then(doc => {
+     console.log(doc)
+   })
+   .catch(err => {
+     console.error(err)
+   })
+
+router.get('/',async (req,res) => {
+    
+    res.render('index');
+});
+
+
+
+// router.get('/donation', async (req,res) => {
+  
+//     res.render('donationTable', {
+//         donations
+//     });
+     
+// });
+router.get('/donation', async (req,res) => {
+    const donations = await Donation . find();
+    res.render('donationTable' , {
+        donations
+    });
+   
+});
+// router.get('/view', async (req,res) => {
+  
+ 
+//   await Donation.find({},select({_id: id }), {multi: true}, (err, doc) => {
+//   if (err) {
+//       console.log("Something wrong when updating data!");
+//   }
+
+//   console.log(doc);
+// });
+// res.render('/donation');
+ 
+// });
+  
+
+router.get('/view/:id', async (req,res) => {
+  const { id }   = req.params;
+  const donations = await Donation.findById({_id: id });
+  res.render('viewTable', {
+      donations
+  });
+   
+});
+
+
+router.post('/view/:id', async (req,res) => {
+  const  { id } = req.params;
+  console.log(req.body);
+  await Donation.findOne(({_id: id }), {new: true}, (err, doc) => {
+      if (err) {
+          console.log("");
+      }
+    
+      console.log(doc);
+    });
+  res.redirect('/', {
+    donations
+});
+});
+
+ 
+
+// router.post('/donation',function(req,res){
+//     mongoose.save({name : req.body.name,
+//     contactNumber : req.body.contactNumber,
+//     email : req.body.email,
+//     amount : req.body.amount,
+//     cause : req.body.cause,
+//     time : req.body.time,
+//     transactionID : req.body.transactionID,
+//     orderID : req.body.orderID
+//  });
+
+
+
+router.get('/delete/:id', async(req,res) => {
+    const { id } = req.params;
+    await Donation.remove({_id:id});
+    res.redirect('/donation');
+})
+
+  
+router.get('/donation/mail/:emailid', function (req, res, next) {
+  res.render('mail', {to: req.params.emailid});
+})
+router.get('/donation/mail',async (req,res) => {
+    
+  res.render('mail',{to: req.params.emailid});
+});
+
+router.post('/send-email', function (req, res) {
+
+ 
+  var transport = nodemailer.createTransport(smtpTransport({
+    service: "gmail",
+    port:425,
+    secure: false,
+      auth: {
+          // should be replaced with real sender's account
+          user: 'krishnapriyaprasannan080@gmail.com',
+          pass: 'Krishu$9323230148'
+      },
+      tls: {
+          rejectUnauthorized: false
+      }
+  }
+    ));
+
+  
+  var mailOptions = {
+      // get mail
+        from : req.body.from,
+        to :  req.body.to,
+        subject : req.body.subject,
+        text : req.body.text,
+        jsonTransport: true
+  
+  };
+  transport.sendMail(mailOptions, function(error, info) {
+    if (error) {
+        return console.log(error);
+    }
+    console.log('Message sent: ' + info.response);
+    //flash to show mail sent
+    req.flash('success', 'Mail Sent');
+    res.locals.message = req.flash();
+    res.render('mail',{to: req.body.emailid})
+
+    // req.flash('success', 'Success! Your mail sent.')
+   
+
+
+    // req.flash('success', 'Success! Your mail sent.');
+    // res.redirect('/donation/mail')
+    // req.flash("info", "You went GO, and got redirected to home!");
+    // res.render({info: req.flash("info")},'mail', {to: req.params.emailid});
+  });
+});
+
+// router.get('/send-email',async (req,res) => {
+    
+//   res.redirect('mail',{to: req.params.emailid});
+// });
+module.exports = router;
