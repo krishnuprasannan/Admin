@@ -1,0 +1,132 @@
+const express = require('express');
+const router = express.Router();
+const AddedOrganization = require('../Models/organizationModel');
+const AddOrganization = require('../Models/organizationModel');
+const ListedOrganization = require('../Models/organizationModel');
+
+//added organization
+const org = new AddedOrganization( {organizationName: 'abc',
+Date : Date.now(),
+addedBy: 'uiokjn'})
+org.save()
+   .then(doc => {
+     console.log(doc)
+   })
+   .catch(err => {
+     console.error(err)
+   })
+
+router.get('/',async (req,res) => {
+    
+    res.render('index');
+});
+
+  
+router.get('/addedOrganization', async (req,res) => {
+    const addedOrganization = await AddedOrganization . find();
+    res.render('addedOrganization' , {
+        addedOrganization
+    });
+   
+});
+
+//add organization
+  
+router.get('/addOrganization', async (req,res) => {
+  const addOrgtns = await AddOrganization . find();
+    res.render('addOrganization' , {
+        addOrgtns
+    });
+   
+});
+router.get('/organizationForm', async (req,res) => {
+  const addOrganization = await AddOrganization . find();
+    res.render('organizationForm' , {
+        addOrganization
+    });
+   
+});
+
+router.post('/addOrganization', async (req,res) => { 
+  const addOrgtn = new AddOrganization({
+      addOrguser : req.body.addOrguser, 
+      addOrgdate : req.body.addOrgdate,
+      addOrglocation : req.body.addOrglocation,
+      addOrgContactPerson : req.body.addOrgContactPerson,
+      addOrgMobile : req.body.addOrgMobile,
+      addOrgComment : req.body.addOrgComment,
+      addOrg_name : req.body.addOrg_name,
+      addOrg_email : req.body.addOrg_email,
+      addOrgcontact : req.body.addOrgcontact,
+      addOrgpassword : req.body.addOrgpassword,
+      addOrgpassword2 : req.body.addOrgpassword2,
+      addOrgcategories : req.body.addOrgcategories,
+      addOrglocation : req.body.addOrglocation2,
+      addOrgauditors_email : req.body.addOrgauditors_email,
+      addOrgmedia_links : req.body.addOrgmedia_links,
+      addOrgpan_number : req.body.addOrgpan_number,
+      addOrgcertificates : req.body.addOrgcertificates,
+     
+  });
+  
+  await addOrgtn.save();
+  console.log('received');
+  res.redirect('/addOrganization');
+});
+
+router.get('/deleteForms/:id', async(req,res) => {
+  const { id } = req.params;
+  await AddOrganization.findByIdAndRemove({_id:id});
+  res.redirect('/addorganization');
+})
+
+router.get('/viewForms/:id', async (req,res) => {
+  const { id }   = req.params;
+  const addOrgtn = await AddOrganization.findById({_id: id });
+  res.render('orgViewDetail', {
+      addOrgtn
+  });
+   
+});
+
+
+router.post('/viewForms/:id', async (req,res) => {
+  const  { id } = req.params;
+  console.log(req.body);
+  await AddOrganization.findOne(({_id: id }), {new: true}, (err, doc) => {
+      if (err) {
+          console.log("");
+      }
+    
+      console.log(doc);
+    });
+  res.redirect('/', {
+    addOrgtn
+});
+});
+//listed organization
+const listorg = new ListedOrganization( {organizationName: 'kghd',
+org_Address: 'abd,link road,Mumbai',
+org_Contact: '9677832294',
+org_ContactPerson:'9565787645',
+org_ContactNumber:'956734767',
+org_Status:'rlk', 
+org_Response:'jrgh',
+org_Comment:'grfuyg'})
+listorg.save()
+   .then(doc => {
+     console.log(doc)
+   })
+   .catch(err => {
+     console.error(err)
+   })
+
+router.get('/listedOrganization', async (req,res) => {
+  const listOrg = await ListedOrganization . find();
+  res.render('listedOrganization' , {
+      listOrg
+  });
+ 
+});
+
+module.exports = router;
